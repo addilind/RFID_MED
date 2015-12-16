@@ -1,1 +1,6 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/icons">
+        <file>pill.png</file>
+        <file>drugstore.png</file>
+    </qresource>
+</RCC>

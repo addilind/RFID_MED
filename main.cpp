@@ -4,8 +4,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Homestation w;
-    w.show();
+    Homestation home;
+    home.show();
 
     return a.exec();
 }

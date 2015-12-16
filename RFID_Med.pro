@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql serialport
+CONFIG   += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +14,15 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        homestation.cpp
+        homestation.cpp \
+    datastore.cpp \
+    reader.cpp
 
-HEADERS  += homestation.h
+HEADERS  += homestation.h \
+    datastore.h \
+    reader.h
 
 FORMS    += homestation.ui
+
+RESOURCES += \
+    resources.qrc
