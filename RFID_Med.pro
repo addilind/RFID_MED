@@ -16,13 +16,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         homestation.cpp \
     datastore.cpp \
-    reader.cpp
+    reader.cpp \
+    settings.cpp
 
 HEADERS  += homestation.h \
     datastore.h \
-    reader.h
+    reader.h \
+    settings.h
 
-FORMS    += homestation.ui
+FORMS    += homestation.ui \
+    settings.ui
 
 RESOURCES += \
     resources.qrc

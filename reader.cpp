@@ -2,14 +2,30 @@
 #include <iostream>
 #include <string>
 
-Reader::Reader(QObject *parent) : QObject(parent), serialConn(this),
-    readerState(NONE), readBuffer(), pollTimer(this)
+Reader::Reader(const QString& portName, QObject *parent) : QObject(parent),
+    readerState(NONE), serialConn(this), readBuffer(), pollTimer(this)
 {
     serialConn.close();
-    serialConn.setPortName("/dev/ttyUSB0");
+    serialConn.setPortName(portName);
 
+    connect(&serialConn, SIGNAL(readyRead()), this, SLOT(readSerial()));
+
+    pollTimer.setSingleShot(false);
+    connect(&pollTimer, SIGNAL(timeout()), this, SLOT(startPoll()));
+}
+
+Reader::~Reader()
+{
+    serialConn.close();
+}
+
+void Reader::BeginConnect()
+{
     if(!serialConn.open(QSerialPort::ReadWrite))
-        throw std::runtime_error("Cannot open Serial port");
+        throw std::runtime_error(qPrintable(tr("Serielle Schnittstelle '") +
+                                            serialConn.portName() +
+                                            tr("' konnte nicht geöffnet werden,\n"
+                                               "bitte per Befehlszeilenoption -p festlegen!")));
 
     serialConn.setBaudRate(9600);
     serialConn.setDataBits(QSerialPort::DataBits::Data8);
@@ -17,30 +33,30 @@ Reader::Reader(QObject *parent) : QObject(parent), serialConn(this),
     serialConn.setParity(QSerialPort::Parity::NoParity);
     serialConn.setFlowControl(QSerialPort::FlowControl::NoFlowControl);
 
-    connect(&serialConn, SIGNAL(readyRead()), this, SLOT(readSerial()));
-
-    doRFC();
-
-    pollTimer.setSingleShot(false);
-    connect(&pollTimer, SIGNAL(timeout()), this, SLOT(startPoll()));
+    doRFC(); //beginne Initialisierung
 }
 
 void Reader::readSerial()
-{
+{//Wird aufgerufen, sobald Daten auf der seriellen Schnittstelle empfangen wurden
     auto data = serialConn.readAll();
-    for(auto datait = data.begin(); datait != data.end(); ++datait) {
-        //std::cout << (int)(*datait)<<std::endl;
-        if(*datait == '\r')
-            processBuffer();
-        else
+    for(auto datait = data.begin(); datait != data.end(); ++datait) { //Zeichenweise gelesene Daten einlesen
+        if(*datait == '\r') { //\r beendet eine Antwort, aktuellen Puffer verarbeiten
+            try {
+                processBuffer();
+            }
+            catch(std::exception& ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                ErrorOccured(ex);
+            }
+        }
+        else //ansonsten an Puffer anhängen
             readBuffer.append(*datait);
     }
-
-    //std::cout << std::string(data.constData(), data.length()) << std::endl;
 }
 
 void Reader::startPoll()
-{
+{//Wird regelmäßig aufgerufen, um aktuelle Tags zu scannen
     if(readerState != STATE::IDLE)
         return; //Etwas anderes nutzt die Schnitstelle gerade!
     doTIF();
@@ -52,49 +68,52 @@ void Reader::processBuffer()
         case STATE::NONE:
             break; //Connected etc ignorieren
         case STATE::RFC:
-            checkOK(std::runtime_error("Cannot set RF-Field to on"));
+            checkOK("Kann RF-Feld nicht aktivieren");
             doOEC();
             break;
         case STATE::OEC:
-            checkOK(std::runtime_error("Cannot set OutputEnable to on"));
+            checkOK("Kann OutputEnable nicht aktivieren");
             doATC();
             break;
         case STATE::ATC:
-            checkOK(std::runtime_error("Cannot set AntennaTuning to slow"));
+            checkOK("Kann AntennaTuning nicht auf slow setzen");
             doSRT();
             break;
         case STATE::SRT:
-            checkOK(std::runtime_error("Cannot set ReaderTag to 5567"));
+            checkOK("Kann ReaderTag nicht auf 5567 setzen");
             doSRM();
             break;
         case STATE::SRM:
-            checkOK(std::runtime_error("Cannot set ReaderModulation to MAN"));
-            std::cout << "Reader initialized" << std::endl;
+            checkOK("Kann ReaderModulation nicht auf MAN setzen");
             ConnectionEstablished();
             readerState = STATE::IDLE;
             pollTimer.start(POLLTIME);
             break;
         case STATE::IDLE:
-            //
+            //This should never happen (TM)
+            //Der Scanner hat etwas geantwortet, ohne das wir die Frage kennen
+            //könnte bei Verlassen & erneutem Aufruf des seriellen Modus am Gerät auftreten,
+            //aber das sollte man sowieso während des Betriebs nicht tun
             break;
         case STATE::POLL_TIF:
-            checkOK(std::runtime_error("Cannot test if tag present"));
+            checkOK("Kann nicht auf Vorhandensein von Tags prüfen");
             processTIF();
             break;
         case STATE::RSS:
-            processRSS(); //Errorhandling in processRSS
+            processRSS(); //Errorhandling übernimmt processRSS, da Länge auch überprüft wird
             break;
     }
     readBuffer.clear();
 }
 
-void Reader::checkOK(const std::exception& ex)
-{
+void Reader::checkOK(const char* ex_msg)
+{//Überprüft, ob Antwort mit OK beginnt
     if(memcmp(readBuffer.constData(), "OK", 2) != 0)
     {
-        std::cerr << "Reader returned error:"
-                  << std::string(readBuffer.constData(), readBuffer.length()) << std::endl;
-        throw ex;
+        auto msg = qPrintable(tr(ex_msg) + tr("\nAntwort: ") +
+                              QString::fromLocal8Bit(readBuffer.constData(), readBuffer.length()));
+        std::cerr << msg << std::endl;
+        throw std::runtime_error(msg);
     }
 }
 
@@ -153,7 +172,7 @@ void Reader::processTIF()
 void Reader::doRSS()
 {
     readerState = STATE::RSS;
-    serialConn.write("RDRSS0224\r"); //Lese 32bit (1.Block) per TerminatorSync
+    serialConn.write("RDRSS0224\r"); //Lese 224bit per StreamSync
     serialConn.flush();
 }
 
@@ -163,7 +182,8 @@ void Reader::processRSS() {
                   << std::string(readBuffer.constData(), readBuffer.length()) << std::endl;
         throw std::runtime_error("Cannot read Tag Data: unexpected response");
     }
-    std::string tagId = std::string(readBuffer.constData() + 7, 8);
+    const char* readPos = readBuffer.constData() + 7; //Überspringe
+    std::string tagId = std::string(readPos, 8);
     std::cout << "Tag: " << tagId << std::endl;
     readerState = STATE::IDLE;
 }

@@ -8,7 +8,7 @@ class Datastore : public QObject
 {
     Q_OBJECT
 public:
-    explicit Datastore(QObject *parent = 0);
+    explicit Datastore(const QString& fileName, QObject *parent = 0);
     ~Datastore();
 
 signals:

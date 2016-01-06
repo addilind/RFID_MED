@@ -9,11 +9,14 @@ class Reader : public QObject
 {
     Q_OBJECT
 public:
-    explicit Reader(QObject *parent = 0);
+    explicit Reader(const QString& portName, QObject *parent = 0);
     static const int POLLTIME = 2000;
+    virtual ~Reader();
+    void BeginConnect();
 
 signals:
     void ConnectionEstablished();
+    void ErrorOccured(const std::exception& exception_msg);
 public slots:
 
 private slots:
@@ -29,7 +32,7 @@ private:
 
     void processBuffer();
 
-    void checkOK(const std::exception& ex);
+    void checkOK(const char* ex);
     void doRFC();
     void doOEC();
     void doATC();

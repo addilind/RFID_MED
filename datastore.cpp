@@ -1,12 +1,12 @@
 #include "datastore.h"
 #include <QSqlQuery>
 
-Datastore::Datastore(QObject *parent) : QObject(parent)
+Datastore::Datastore(const QString& fileName, QObject *parent) : QObject(parent)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("rfidmed.sqlite");
+    db.setDatabaseName(fileName);
     if(!db.open())
-        throw std::runtime_error("Cannot open database rfidmed.sqlite");
+        throw std::runtime_error(qPrintable(tr("Kann Datenbank '") + fileName + tr("' nicht öffnen")));
     initializeDB();
 }
 
