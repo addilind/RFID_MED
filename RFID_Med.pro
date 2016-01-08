@@ -4,10 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql serialport
-CONFIG   += c++11
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += core gui sql serialport widgets
+CONFIG   += c++14
 
 TARGET = RFID_Med
 TEMPLATE = app
@@ -17,15 +15,23 @@ SOURCES += main.cpp\
         homestation.cpp \
     datastore.cpp \
     reader.cpp \
-    settings.cpp
+    settings.cpp \
+    Model/medication.cpp \
+    Model/unit.cpp \
+    simulator.cpp
 
 HEADERS  += homestation.h \
     datastore.h \
     reader.h \
-    settings.h
+    settings.h \
+    Model/medication.h \
+    Model/dbprop.h \
+    Model/unit.h \
+    simulator.h
 
 FORMS    += homestation.ui \
-    settings.ui
+    settings.ui \
+    simulator.ui
 
 RESOURCES += \
     resources.qrc

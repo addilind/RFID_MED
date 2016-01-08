@@ -14,9 +14,13 @@ public:
     virtual ~Reader();
     void BeginConnect();
 
+    bool getTagPresent();
+    uint getLastTagId();
+
 signals:
     void ConnectionEstablished();
     void ErrorOccured(const std::exception& exception_msg);
+    void TagChanged(bool present, uint id);
 public slots:
 
 private slots:
@@ -29,6 +33,9 @@ private:
     QSerialPort serialConn;
     QByteArray readBuffer;
     QTimer pollTimer;
+
+    bool tagPresent;
+    uint tagId;
 
     void processBuffer();
 

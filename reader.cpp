@@ -3,7 +3,8 @@
 #include <string>
 
 Reader::Reader(const QString& portName, QObject *parent) : QObject(parent),
-    readerState(NONE), serialConn(this), readBuffer(), pollTimer(this)
+    readerState(NONE), serialConn(this), readBuffer(), pollTimer(this),
+    tagPresent(false), tagId(0U)
 {
     serialConn.close();
     serialConn.setPortName(portName);
@@ -34,6 +35,16 @@ void Reader::BeginConnect()
     serialConn.setFlowControl(QSerialPort::FlowControl::NoFlowControl);
 
     doRFC(); //beginne Initialisierung
+}
+
+bool Reader::getTagPresent()
+{
+    return tagPresent;
+}
+
+uint Reader::getLastTagId()
+{
+    return tagId;
 }
 
 void Reader::readSerial()
@@ -163,6 +174,12 @@ void Reader::processTIF()
     if(memcmp(readBuffer.constData(), "OK0007", 6) == 0)
     {//Falls kein Tag im Feld ist, wieder zu IDLE wechseln
         readerState = STATE::IDLE;
+
+        if(tagPresent) //Falls beim letzten Scan ein Tag vorhanden war
+        {
+            tagPresent = false;
+            TagChanged(false, tagId);//über Änderung benachrichtigen
+        }
         return;
     }
     //Ansonsten Tag lesen
@@ -172,18 +189,39 @@ void Reader::processTIF()
 void Reader::doRSS()
 {
     readerState = STATE::RSS;
-    serialConn.write("RDRSS0224\r"); //Lese 224bit per StreamSync
+    serialConn.write("RDRSS0224\r"); //Lese 224bit via StreamSync
     serialConn.flush();
 }
 
 void Reader::processRSS() {
-    if(memcmp(readBuffer.constData(), "OK0057 ",7) != 0) {
-        std::cerr << "Reader returned error:"
-                  << std::string(readBuffer.constData(), readBuffer.length()) << std::endl;
-        throw std::runtime_error("Cannot read Tag Data: unexpected response");
+    if(readBuffer.size() < 15 || memcmp(readBuffer.constData(), "OK0057 ",7) != 0) {
+        auto msg = qPrintable(tr("Kann Tag nicht lesen, \nAntwort: ") +
+                              QString::fromLatin1(readBuffer.constData(), readBuffer.length()));
+        std::cerr << msg << std::endl;
+        throw std::runtime_error(msg);
     }
-    const char* readPos = readBuffer.constData() + 7; //Überspringe
-    std::string tagId = std::string(readPos, 8);
-    std::cout << "Tag: " << tagId << std::endl;
+    const char* readPos = readBuffer.constData() + 7; //Überspringe OK & Länge
+
+    QString tagId_str = QString::fromLatin1(readPos, 8);
+    readPos += 8;
+    bool parseSuccess = false;
+    uint tagId = tagId_str.toInt(&parseSuccess, 16);
+    if(!parseSuccess) {
+        auto msg = qPrintable(tr("Kann Tag-ID nicht lesen (nicht Hexadezimal)\nTagID-Text: ") + tagId_str);
+        std::cerr << msg << std::endl;
+        throw std::runtime_error(msg);
+    }
+
+    bool isChange = !tagPresent; //Falls vorher kein Tag im Feld war ist es auf jeden Fall eine Änderung
+    if(tagPresent) //Falls vorher ein Tag im Feld war auf gleiche Id überprüfen
+        isChange = this->tagId != tagId;
+
+
+    if(isChange) {
+        tagPresent = true;
+        this->tagId = tagId;
+        TagChanged(true, tagId);//über Änderung benachrichtigen
+    }
+
     readerState = STATE::IDLE;
 }

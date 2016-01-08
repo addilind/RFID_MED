@@ -12,18 +12,40 @@ Datastore::Datastore(const QString& fileName, QObject *parent) : QObject(parent)
 
 Datastore::~Datastore()
 {
+    db.commit();
     db.close();
+}
+
+Medication Datastore::getMedication(uint id)
+{
+    return Medication(&db, id);
+}
+
+Medication Datastore::addMedication(QString& name)
+{
+    return Medication::CreateNew(&db, name);
+}
+
+Unit Datastore::getUnitInfo(uint tag)
+{
+    return Unit(&db, tag);
 }
 
 void Datastore::initializeDB()
 {
     QSqlQuery query(db);
-    if (!query.exec("CREATE TABLE IF NOT EXISTS medication(medicationId INTEGER, name TEXT);"))
-        throw std::runtime_error("Cannot create database schema");
-    if (!query.exec("CREATE TABLE IF NOT EXISTS knownTag(tagId INTEGER, medicationId INTEGER, "
-                    "countMo INTEGER, countTu INTEGER, countWe INTEGER, countTh INTEGER, "
-                    "countFr INTEGER, countSa INTEGER, countSu INTEGER);"))
-        throw std::runtime_error("Cannot create database schema");
-
+    query.exec("PRAGMA foreign_keys = ON;");
+    Medication::CreateSchema(&db);
+    Unit::CreateSchema(&db);
     db.commit();
+}
+
+void Datastore::TagChanged(bool present, uint id)
+{
+    if(present) {
+        Unit u(&db, id);
+        emit UnitChanged(&u);
+    }
+    else
+        emit UnitChanged(nullptr);
 }
