@@ -95,7 +95,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="settingsBtn">
         <property name="text">
          <string>Einstellungen</string>
         </property>

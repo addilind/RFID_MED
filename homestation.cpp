@@ -6,14 +6,21 @@
 Homestation::Homestation(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Homestation),
+    settings(nullptr),
     dstore(nullptr),
     reader(nullptr)
 {
     ui->setupUi(this);
+    connect(ui->settingsBtn, SIGNAL(pressed()), this, SLOT(openSettings()));
 }
 
 Homestation::~Homestation()
 {
+    if(settings != nullptr) {
+        if(settings->isVisible())
+            settings->close();
+        delete settings;
+    }
     if(dstore != nullptr)
         delete dstore;
     if(reader != nullptr)
@@ -63,9 +70,20 @@ void Homestation::UnitChanged(Unit *u)
     ui->progressBar->setEnabled(false);
 }
 
+void Homestation::openSettings()
+{
+    assert(settings != nullptr);
+    settings->show();
+}
+
 void Homestation::showEvent(QShowEvent *event)
 {
     try {
+        if(settings == nullptr)
+        {
+            settings = new Settings(dstore, this);
+        }
+
         if(dstore == nullptr)
         {
             dstore = new Datastore(dbFileName, this);

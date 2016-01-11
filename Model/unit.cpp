@@ -22,16 +22,18 @@ Unit::Unit(QSqlDatabase *database, unsigned int tagId)
             throw std::runtime_error(
                     qPrintable(QApplication::tr("DB-Fehler:\nKann Tag nicht hinzufügen:\n") + query.lastError().text()));
         rowId = query.lastInsertId().toUInt();
+        db->commit();
     }
     else
     {
         rowId = query.value(0).toUInt();
     }
-    medId.init(database, tagId);
+    medId.init(database, rowId);
+    timesSeen.init(database, rowId);
 }
 
 Unit::Unit(const Unit &source)
-    : tagId(source.tagId), rowId(source.rowId), db(source.db)
+    : tagId(source.tagId), rowId(source.rowId), db(source.db), timesSeen(source.timesSeen)
 {
 
 }
@@ -40,7 +42,7 @@ void Unit::CreateSchema(QSqlDatabase *database)
 {
     QSqlQuery query(*database);
     if (!query.exec("CREATE TABLE IF NOT EXISTS knownTag(tagId INTEGER UNIQUE, medicationId INTEGER, "
-                    "FOREIGN KEY(medicationId) REFERENCES medication(medicationId) );"))
+                    "timesSeen INTEGER DEFAULT 0, FOREIGN KEY(medicationId) REFERENCES medication(medicationId) );"))
         throw std::runtime_error(
                 qPrintable(QApplication::tr("DB-Fehler:\nKann DatenbankSchema für Tags nicht erstellen:\n") + query.lastError().text()));
     query.finish();
@@ -56,14 +58,7 @@ unsigned int Unit::GetTagId() const
 
 bool Unit::IsMedicationSet()
 {
-    QSqlQuery query(*db);
-    query.setForwardOnly(true);
-    query.prepare("SELECT rowid FROM knownTag WHERE rowid = :row AND medicationId IS NOT NULL LIMIT 1;");
-    query.bindValue(":row", rowId);
-    if(!query.exec())
-        throw std::runtime_error(
-                qPrintable(QApplication::tr("DB-Fehler:\nKann Tag nicht auf Verknüpfung prüfen:\n") + query.lastError().text()));
-    return query.next(); //Medikament ist gesetzt
+    return !medId.IsNull(); //Medikament ist gesetzt
 }
 
 void Unit::SetMedication(const Medication &med)
@@ -74,4 +69,14 @@ void Unit::SetMedication(const Medication &med)
 Medication Unit::GetMedication()
 {
     return Medication(db, medId.Get());
+}
+
+void Unit::Seen()
+{
+    timesSeen.Set(timesSeen.Get() + 1);
+}
+
+unsigned int Unit::GetTimesSeen()
+{
+    return timesSeen.Get();
 }

@@ -44,6 +44,7 @@ void Datastore::TagChanged(bool present, uint id)
 {
     if(present) {
         Unit u(&db, id);
+        u.Seen(); //Zähler erhöhen
         emit UnitChanged(&u);
     }
     else

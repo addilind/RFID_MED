@@ -6,6 +6,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include "settings.h"
 #include "datastore.h"
 #include "reader.h"
 
@@ -32,8 +33,13 @@ public slots:
     void Ready();
     void SubmoduleError(const std::exception& ex);
     void UnitChanged(Unit* u);
+
+private slots:
+    void openSettings();
+
 private:
     Ui::Homestation *ui;
+    Settings* settings;
     Datastore* dstore;
 #ifdef USESIM
     Simulator* reader;

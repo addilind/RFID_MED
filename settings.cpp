@@ -1,9 +1,10 @@
 #include "settings.h"
 #include "ui_settings.h"
 
-Settings::Settings(QWidget *parent) :
+Settings::Settings(Datastore *dstore, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Settings)
+    ui(new Ui::Settings),
+    dstore(dstore)
 {
     ui->setupUi(this);
 }

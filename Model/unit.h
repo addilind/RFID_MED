@@ -16,6 +16,9 @@ public:
     bool IsMedicationSet();
     void SetMedication(const Medication& med);
     Medication GetMedication();
+
+    void Seen();
+    unsigned int GetTimesSeen();
 private:
     unsigned int tagId;
     unsigned int rowId;
@@ -25,7 +28,9 @@ private:
     constStr(tableName, "knownTag") //SQL-Tabelle
     constStr(idCol, "rowid")        //Spalte, in der der Tabellen-Primärschlüssel steht, hier die automatisch vorhandene rowid
     constStr(medCol, "medicationId")//Spalte für Medikament-ID
+    constStr(seenCol, "timesSeen")//Spalte für Zähler
     dbprop<unsigned int, tableName, medCol, idCol> medId;
+    dbprop<unsigned int, tableName, seenCol, idCol> timesSeen;
 };
 
 #endif // UNIT_H
