@@ -13,9 +13,13 @@ public:
     explicit Datastore(const QString& fileName, QObject *parent = 0);
     ~Datastore();
 
-    Medication getMedication(uint id);
-    Medication addMedication(QString& name);
-    Unit getUnitInfo(uint tagId);
+    Medication GetMedication(uint id);
+    Medication AddMedication(const QString& name);
+    Unit GetUnit(uint tagId);
+    uint GetMedicationCount();
+    std::vector<uint> GetMedicationIds();
+    std::vector<uint> GetUnitTagIds();
+    std::vector<Unit> GetUnitsByMedication(const Medication& med);
 signals:
     void UnitChanged(Unit* u);
 

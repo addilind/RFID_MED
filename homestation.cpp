@@ -79,11 +79,6 @@ void Homestation::openSettings()
 void Homestation::showEvent(QShowEvent *event)
 {
     try {
-        if(settings == nullptr)
-        {
-            settings = new Settings(dstore, this);
-        }
-
         if(dstore == nullptr)
         {
             dstore = new Datastore(dbFileName, this);
@@ -104,6 +99,11 @@ void Homestation::showEvent(QShowEvent *event)
             connect(reader, SIGNAL(ErrorOccured(std::exception)), this, SLOT(SubmoduleError(std::exception)));
             connect(reader, SIGNAL(TagChanged(bool,uint)), dstore, SLOT(TagChanged(bool,uint)));
             reader->BeginConnect();
+        }
+
+        if(settings == nullptr)
+        {
+            settings = new Settings(dstore, this);
         }
     }
     catch(std::exception& ex){

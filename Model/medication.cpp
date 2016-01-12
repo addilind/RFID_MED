@@ -1,7 +1,8 @@
 #include "medication.h"
 
 Medication::Medication(QSqlDatabase* database, unsigned int dbId)
-    :dbId(dbId), counts { &countMo, &countTu, &countWe, &countTh, &countFr, &countSa, &countSu }
+    :dbId(dbId), counts { &countMo, &countTu, &countWe, &countTh, &countFr, &countSa, &countSu },
+      db(database)
 {
     name.init(database, dbId);
     countMo.init(database, dbId);
@@ -41,7 +42,35 @@ QString Medication::GetName() {
     return name.Get();
 }
 
-Medication Medication::CreateNew(QSqlDatabase *database, QString name)
+uint8_t Medication::GetDailyCount(uint day)
+{
+    if(day >= 7)
+        throw std::runtime_error(qPrintable(QApplication::tr("Dosierung für ungültigen Tag abgefragt!")));
+    return counts[day]->Get();
+}
+
+void Medication::SetName(const QString &newname)
+{
+    name.Set(newname);
+}
+
+void Medication::SetDailyCount(uint day, uint8_t count)
+{
+    if(day >= 7)
+        throw std::runtime_error(qPrintable(QApplication::tr("Dosierung für ungültigen Tag gesetzt!")));
+    return counts[day]->Set(count);
+}
+
+void Medication::Delete()
+{
+    QSqlQuery query(*db);
+    query.prepare("DELETE FROM Medication WHERE medicationId = :medId");
+    query.bindValue(":medId", dbId);
+    if(!query.exec())
+        throw std::runtime_error("DB-Fehler: Kann Medikament nicht löschen!");
+}
+
+Medication Medication::CreateNew(QSqlDatabase *database, const QString& name)
 {
     QSqlQuery query(*database);
     query.prepare("INSERT INTO Medication (name) VALUES (:name)");
@@ -59,4 +88,27 @@ void Medication::CreateSchema(QSqlDatabase *database)
                     "countTh INTEGER DEFAULT 0, countFr INTEGER DEFAULT 0, countSa INTEGER DEFAULT 0, "
                     "countSu INTEGER DEFAULT 0);"))
         throw std::runtime_error("Cannot create database schema");
+}
+
+unsigned int Medication::GetMedicationCount(QSqlDatabase *database)
+{
+    QSqlQuery query(*database);
+    query.setForwardOnly(true);
+    if (!query.exec("SELECT COUNT(medicationId) FROM medication;"))
+        throw std::runtime_error("DB-Fehler: Kann Medikamente nicht zählen");
+    if(!query.next())
+        throw std::runtime_error("DB-Fehler: Kann Medikamente nicht zählen\nKein Ergebnis");
+    return query.value(0).toUInt();
+}
+
+std::vector<uint> Medication::GetMedicationIds(QSqlDatabase *database)
+{
+    QSqlQuery query(*database);
+    query.setForwardOnly(true);
+    if (!query.exec("SELECT medicationId FROM medication ORDER BY name;"))
+        throw std::runtime_error("DB-Fehler: Kann Medikamente nicht auflisten");
+    std::vector<uint> result;
+    while(query.next())
+        result.push_back(query.value(0).toUInt());
+    return result;
 }

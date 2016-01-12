@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     settings.cpp \
     Model/medication.cpp \
     Model/unit.cpp \
-    simulator.cpp
+    simulator.cpp \
+    Model/medsettings.cpp \
+    Model/unitsettings.cpp
 
 HEADERS  += homestation.h \
     datastore.h \
@@ -27,7 +29,9 @@ HEADERS  += homestation.h \
     Model/medication.h \
     Model/dbprop.h \
     Model/unit.h \
-    simulator.h
+    simulator.h \
+    Model/medsettings.h \
+    Model/unitsettings.h
 
 FORMS    += homestation.ui \
     settings.ui \

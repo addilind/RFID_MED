@@ -51,6 +51,32 @@ void Unit::CreateSchema(QSqlDatabase *database)
                 qPrintable(QApplication::tr("DB-Fehler:\nKann DatenbankIndex für TagIds nicht erstellen:\n") + query.lastError().text()));
 }
 
+std::vector<uint> Unit::GetTagIds(QSqlDatabase *database)
+{
+    QSqlQuery query(*database);
+    query.setForwardOnly(true);
+    if (!query.exec("SELECT tagId FROM knownTag ORDER BY tagId ASC;"))
+        throw std::runtime_error("DB-Fehler: Kann Packungen nicht auflisten");
+    std::vector<uint> result;
+    while(query.next())
+        result.push_back(query.value(0).toUInt());
+    return result;
+}
+
+std::vector<Unit> Unit::GetByMedication(QSqlDatabase* database, const Medication &med)
+{
+    QSqlQuery query(*database);
+    query.setForwardOnly(true);
+    query.prepare("SELECT tagId FROM knownTag WHERE medicationID = :medId;");
+    query.bindValue(":medId", med.GetDbId());
+    if (!query.exec())
+        throw std::runtime_error("DB-Fehler: Kann nicht nach zu Medikament gehörenden Packungen suchen!");
+    std::vector<Unit> result;
+    while(query.next())
+        result.push_back(Unit(database, query.value(0).toUInt()));
+    return result;
+}
+
 unsigned int Unit::GetTagId() const
 {
     return tagId;
@@ -64,6 +90,11 @@ bool Unit::IsMedicationSet()
 void Unit::SetMedication(const Medication &med)
 {
     medId.Set(med.GetDbId());
+}
+
+void Unit::UnsetMedication()
+{
+    medId.Unset();
 }
 
 Medication Unit::GetMedication()

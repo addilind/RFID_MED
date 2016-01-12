@@ -2,6 +2,7 @@
 #define MEDICATION_H
 
 #include <QString>
+#include <vector>
 #include "dbprop.h"
 
 class Medication
@@ -11,14 +12,20 @@ public:
     Medication(const Medication& source);
     virtual ~Medication();
 
-    unsigned int GetDbId() const;
+    uint GetDbId() const;
     QString GetName();
+    uint8_t GetDailyCount(uint day);
+    void SetName(const QString& name);
+    void SetDailyCount(uint day, uint8_t count);
+    void Delete();
 
-    static Medication CreateNew(QSqlDatabase* database, QString name);
+    static Medication CreateNew(QSqlDatabase* database, const QString& name);
     static void CreateSchema(QSqlDatabase* database);
-
+    static unsigned int GetMedicationCount(QSqlDatabase *database);
+    static std::vector<uint> GetMedicationIds(QSqlDatabase *database);
 private:
     unsigned int dbId;
+    QSqlDatabase* db;
 
     //Strings für compile-time dbprops anlegen
     constStr(tableName, "medication") //SQL-Tabelle
@@ -30,17 +37,17 @@ private:
     constStr(countThCol, "countTh")
     constStr(countFrCol, "countFr")
     constStr(countSaCol, "countSa")
-    constStr(countSuCol, "countSo")
+    constStr(countSuCol, "countSu")
 
     dbprop<QString, tableName, nameCol, idCol> name;
-    dbprop<unsigned char, tableName, countMoCol, idCol> countMo;
-    dbprop<unsigned char, tableName, countTuCol, idCol> countTu;
-    dbprop<unsigned char, tableName, countWeCol, idCol> countWe;
-    dbprop<unsigned char, tableName, countThCol, idCol> countTh;
-    dbprop<unsigned char, tableName, countFrCol, idCol> countFr;
-    dbprop<unsigned char, tableName, countSaCol, idCol> countSa;
-    dbprop<unsigned char, tableName, countSuCol, idCol> countSu;
-    dbpropg<unsigned char>* counts[7]; //Für leichteren Zugriff noch als array
+    dbprop<uint8_t, tableName, countMoCol, idCol> countMo;
+    dbprop<uint8_t, tableName, countTuCol, idCol> countTu;
+    dbprop<uint8_t, tableName, countWeCol, idCol> countWe;
+    dbprop<uint8_t, tableName, countThCol, idCol> countTh;
+    dbprop<uint8_t, tableName, countFrCol, idCol> countFr;
+    dbprop<uint8_t, tableName, countSaCol, idCol> countSa;
+    dbprop<uint8_t, tableName, countSuCol, idCol> countSu;
+    dbpropg<uint8_t>* counts[7]; //Für leichteren Zugriff noch als array
 };
 //const char Medication::DBP_Medication[] = "Medication";
 

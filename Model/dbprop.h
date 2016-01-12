@@ -77,7 +77,8 @@ public:
     dbpropg();
     virtual ~dbpropg();
     virtual T Get() = 0;
-    virtual void Set(T val) =0;
+    virtual void Set(const T& val) =0;
+    virtual void Unset() = 0;
     virtual bool IsNull() = 0;
 };
 
@@ -93,9 +94,10 @@ public:
     virtual ~dbprop();
     void init(QSqlDatabase* database, uint pid);
     //Init ist nicht im Konstruktor, damit Nutzer DB-Initialisierung vorher durchführen können
-    virtual T Get();
-    virtual void Set(T val);
-    virtual bool IsNull();
+    virtual T Get() override;
+    virtual void Set(const T& val) override;
+    virtual void Unset() override;
+    virtual bool IsNull() override;
 
 private:
     uint parentId;
@@ -185,7 +187,6 @@ DBP_TEMPLATE
 T dbprop DBP_TEMPPARA::Get()
 {
     assert(initialized);
-    qDebug() << "Getting " << valcol::string();
 
     if(!sqlSelect.exec())
         throw std::runtime_error(qPrintable(
@@ -205,12 +206,12 @@ T dbprop DBP_TEMPPARA::Get()
 }
 
 DBP_TEMPLATE
-void dbprop DBP_TEMPPARA::Set(T val)
+void dbprop DBP_TEMPPARA::Set(const T& val)
 {
     assert(initialized);
-    qDebug() << "Setting " << valcol::string();
 
     sqlUpdate.bindValue(":val", val);
+
     if(!sqlUpdate.exec())
         throw std::runtime_error(qPrintable(
                     QApplication::tr("DB-Fehler beim Schreiben von ") + valcol::string() + "\n"
@@ -220,10 +221,23 @@ void dbprop DBP_TEMPPARA::Set(T val)
 }
 
 DBP_TEMPLATE
+void dbprop DBP_TEMPPARA::Unset()
+{assert(initialized);
+
+    sqlUpdate.bindValue(":val", QVariant());
+
+    if(!sqlUpdate.exec())
+        throw std::runtime_error(qPrintable(
+                    QApplication::tr("DB-Fehler beim Leeren von ") + valcol::string() + "\n"
+                                     + sqlSelect.lastError().text() + "\n"
+                                     + sqlSelect.lastQuery()));
+    sqlUpdate.finish();
+}
+
+DBP_TEMPLATE
 bool dbprop DBP_TEMPPARA::IsNull()
 {
     assert(initialized);
-    qDebug() << "Nullchecking " << valcol::string();
 
     if(!sqlSelect.exec())
         throw std::runtime_error(qPrintable(

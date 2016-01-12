@@ -16,19 +16,39 @@ Datastore::~Datastore()
     db.close();
 }
 
-Medication Datastore::getMedication(uint id)
+Medication Datastore::GetMedication(uint id)
 {
     return Medication(&db, id);
 }
 
-Medication Datastore::addMedication(QString& name)
+Medication Datastore::AddMedication(const QString& name)
 {
     return Medication::CreateNew(&db, name);
 }
 
-Unit Datastore::getUnitInfo(uint tag)
+Unit Datastore::GetUnit(uint tag)
 {
     return Unit(&db, tag);
+}
+
+uint Datastore::GetMedicationCount()
+{
+    return Medication::GetMedicationCount(&db);
+}
+
+std::vector<uint> Datastore::GetMedicationIds()
+{
+    return Medication::GetMedicationIds(&db);
+}
+
+std::vector<uint> Datastore::GetUnitTagIds()
+{
+    return Unit::GetTagIds(&db);
+}
+
+std::vector<Unit> Datastore::GetUnitsByMedication(const Medication &med)
+{
+    return Unit::GetByMedication(&db, med);
 }
 
 void Datastore::initializeDB()

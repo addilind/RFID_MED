@@ -20,11 +20,14 @@
   <property name="locale">
    <locale language="German" country="Germany"/>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="medLayout">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="medicationHeader">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
@@ -39,7 +42,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTableWidget" name="medicationList">
+      <widget class="QTableView" name="medicationList">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>1</horstretch>
@@ -58,9 +61,9 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QHBoxLayout" name="medBtnLayout">
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="medAddBtn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -73,20 +76,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>1</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>bearbeiten</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_4">
+        <widget class="QPushButton" name="medDelBtn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -110,9 +100,9 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QVBoxLayout" name="unitLayout">
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="unitHeader">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
@@ -127,19 +117,19 @@
       </widget>
      </item>
      <item>
-      <widget class="QTableWidget" name="tableWidget"/>
+      <widget class="QTableView" name="unitList"/>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QHBoxLayout" name="unitBtnLayout">
        <item>
-        <widget class="QPushButton" name="pushButton_5">
+        <widget class="QPushButton" name="unitAssignBtn">
          <property name="text">
           <string>zuweisen</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_6">
+        <widget class="QPushButton" name="unitDelBtn">
          <property name="text">
           <string>löschen</string>
          </property>

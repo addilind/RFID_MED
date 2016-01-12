@@ -11,14 +11,18 @@ public:
     Unit(QSqlDatabase* database, unsigned int tagId);
     Unit(const Unit& source);
 
-    static void CreateSchema(QSqlDatabase* database);
     unsigned int GetTagId() const;
     bool IsMedicationSet();
     void SetMedication(const Medication& med);
+    void UnsetMedication();
     Medication GetMedication();
 
     void Seen();
     unsigned int GetTimesSeen();
+
+    static void CreateSchema(QSqlDatabase* database);
+    static std::vector<uint> GetTagIds(QSqlDatabase* database);
+    static std::vector<Unit> GetByMedication(QSqlDatabase* database, const Medication& med);
 private:
     unsigned int tagId;
     unsigned int rowId;
