@@ -51,6 +51,7 @@ private:
 
     virtual void showEvent(QShowEvent *event) override;
     void unknownUnit();
+    void showUnit(Unit* u);
 };
 
 #endif // HOMESTATION_H

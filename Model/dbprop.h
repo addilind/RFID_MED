@@ -15,6 +15,11 @@
 #define DBP_TEMPPARA <T, table, valcol, idcol>
 #define DBP_TEMPLATE template <typename T, typename table, typename valcol, typename idcol>
 
+/*
+ * DbProp (Database-Property = Datenbank-Eigenschaft)
+ * Template um properties zu erstellen, die ihren Wert transparent aus einer Datenbank lesen
+ * und Änderungen dorthin schreiben
+ */
 // ================================== Beginn schwarze Compilermagie ======================================
 //compile-time string-concat, grob nach
 // https://stackoverflow.com/questions/9050857/constexpr-with-string-operations-workaround/9054709#9054709

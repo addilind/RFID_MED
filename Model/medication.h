@@ -18,6 +18,7 @@ public:
     void SetName(const QString& name);
     void SetDailyCount(uint day, uint8_t count);
     void Delete();
+    bool AnyUnitSeenToday();
 
     static Medication CreateNew(QSqlDatabase* database, const QString& name);
     static void CreateSchema(QSqlDatabase* database);

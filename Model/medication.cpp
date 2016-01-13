@@ -1,4 +1,5 @@
 #include "medication.h"
+#include "unit.h"
 
 Medication::Medication(QSqlDatabase* database, unsigned int dbId)
     :dbId(dbId), db(database), counts { &countMo, &countTu, &countWe, &countTh, &countFr, &countSa, &countSu }
@@ -67,6 +68,13 @@ void Medication::Delete()
     query.bindValue(":medId", dbId);
     if(!query.exec())
         throw std::runtime_error("DB-Fehler: Kann Medikament nicht löschen!");
+}
+
+bool Medication::AnyUnitSeenToday()
+{
+    auto allUnits = Unit::GetByMedication(db, *this);
+    return std::any_of( allUnits.begin(), allUnits.end(), [](Unit& i)
+                   { return i.GetLastSeen().date() == QDate::currentDate(); });
 }
 
 Medication Medication::CreateNew(QSqlDatabase *database, const QString& name)

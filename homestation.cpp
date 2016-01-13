@@ -65,9 +65,7 @@ void Homestation::UnitChanged(Unit *u)
         return;
     }
 
-    ui->mainPrompt->setText(tr("Medi"));
-    ui->explanation->setText(tr("WTF"));
-    ui->progressBar->setEnabled(false);
+    showUnit(u);
 }
 
 void Homestation::openSettings()
@@ -117,5 +115,20 @@ void Homestation::unknownUnit()
 {
     ui->mainPrompt->setText(tr("Unbekanntes\nMedikament\nerfasst"));
     ui->explanation->setText(tr("Bitte Packung in den Einstellungen eintragen."));
+    ui->progressBar->setEnabled(false);
+}
+
+void Homestation::showUnit(Unit *u)
+{
+    auto med = u->GetMedication();
+    auto main = tr("Dosierung: ") +
+            QString::number(med.GetDailyCount(QDate::currentDate().dayOfWeek() - 1));
+                            //dayOfWeek gibt 1 für Montag, 7 für Sonntag zurück
+    //if(med.AnyUnitSeenToday())
+    //    main += tr("\nHeute schon gescannt!");
+    //Fixme: an dieser Stelle wurde lastseen schon aktualisiert, weshalb hier immer schon gescannt hinzukommt :(
+
+    ui->mainPrompt->setText(main);
+    ui->explanation->setText(med.GetName());
     ui->progressBar->setEnabled(false);
 }

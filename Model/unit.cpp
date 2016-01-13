@@ -125,7 +125,7 @@ QDateTime Unit::GetLastSeen()
     return QDateTime::fromTime_t(lastSeen.Get());
 }
 
-unsigned int Unit::GetTimesSeen()
+uint32_t Unit::GetTimesSeen()
 {
     return timesSeen.Get();
 }
