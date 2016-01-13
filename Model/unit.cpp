@@ -3,7 +3,7 @@
 #include <QSqlError>
 #include <QDebug>
 
-Unit::Unit(QSqlDatabase *database, unsigned int tagId)
+Unit::Unit(QSqlDatabase *database, uint32_t tagId)
     : tagId(tagId), db(database)
 {
     QSqlQuery query(*database);
@@ -30,10 +30,12 @@ Unit::Unit(QSqlDatabase *database, unsigned int tagId)
     }
     medId.init(database, rowId);
     timesSeen.init(database, rowId);
+    lastSeen.init(database, rowId);
 }
 
 Unit::Unit(const Unit &source)
-    : tagId(source.tagId), rowId(source.rowId), db(source.db), timesSeen(source.timesSeen)
+    : tagId(source.tagId), rowId(source.rowId), db(source.db),
+      medId(source.medId), timesSeen(source.timesSeen), lastSeen(source.lastSeen)
 {
 
 }
@@ -42,7 +44,8 @@ void Unit::CreateSchema(QSqlDatabase *database)
 {
     QSqlQuery query(*database);
     if (!query.exec("CREATE TABLE IF NOT EXISTS knownTag(tagId INTEGER UNIQUE, medicationId INTEGER, "
-                    "timesSeen INTEGER DEFAULT 0, FOREIGN KEY(medicationId) REFERENCES medication(medicationId) );"))
+                    "timesSeen INTEGER DEFAULT 0, lastSeen INTEGER DEFAULT (strftime('%s','now')), "
+                    "FOREIGN KEY(medicationId) REFERENCES medication(medicationId) );"))
         throw std::runtime_error(
                 qPrintable(QApplication::tr("DB-Fehler:\nKann DatenbankSchema für Tags nicht erstellen:\n") + query.lastError().text()));
     query.finish();
@@ -51,13 +54,13 @@ void Unit::CreateSchema(QSqlDatabase *database)
                 qPrintable(QApplication::tr("DB-Fehler:\nKann DatenbankIndex für TagIds nicht erstellen:\n") + query.lastError().text()));
 }
 
-std::vector<uint> Unit::GetTagIds(QSqlDatabase *database)
+std::vector<uint32_t> Unit::GetTagIds(QSqlDatabase *database)
 {
     QSqlQuery query(*database);
     query.setForwardOnly(true);
     if (!query.exec("SELECT tagId FROM knownTag ORDER BY tagId ASC;"))
         throw std::runtime_error("DB-Fehler: Kann Packungen nicht auflisten");
-    std::vector<uint> result;
+    std::vector<uint32_t> result;
     while(query.next())
         result.push_back(query.value(0).toUInt());
     return result;
@@ -77,7 +80,7 @@ std::vector<Unit> Unit::GetByMedication(QSqlDatabase* database, const Medication
     return result;
 }
 
-unsigned int Unit::GetTagId() const
+uint32_t Unit::GetTagId() const
 {
     return tagId;
 }
@@ -102,9 +105,24 @@ Medication Unit::GetMedication()
     return Medication(db, medId.Get());
 }
 
+void Unit::Delete()
+{
+    QSqlQuery query(*db);
+    query.prepare("DELETE FROM knownTag WHERE rowid = :rowId");
+    query.bindValue(":rowId", rowId);
+    if(!query.exec())
+        throw std::runtime_error("DB-Fehler: Kann Packung nicht löschen!");
+}
+
 void Unit::Seen()
 {
     timesSeen.Set(timesSeen.Get() + 1);
+    lastSeen.Set(QDateTime::currentDateTime().toTime_t());
+}
+
+QDateTime Unit::GetLastSeen()
+{
+    return QDateTime::fromTime_t(lastSeen.Get());
 }
 
 unsigned int Unit::GetTimesSeen()

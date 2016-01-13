@@ -1,8 +1,7 @@
 #include "medication.h"
 
 Medication::Medication(QSqlDatabase* database, unsigned int dbId)
-    :dbId(dbId), counts { &countMo, &countTu, &countWe, &countTh, &countFr, &countSa, &countSu },
-      db(database)
+    :dbId(dbId), db(database), counts { &countMo, &countTu, &countWe, &countTh, &countFr, &countSa, &countSu }
 {
     name.init(database, dbId);
     countMo.init(database, dbId);
@@ -64,7 +63,7 @@ void Medication::SetDailyCount(uint day, uint8_t count)
 void Medication::Delete()
 {
     QSqlQuery query(*db);
-    query.prepare("DELETE FROM Medication WHERE medicationId = :medId");
+    query.prepare("DELETE FROM medication WHERE medicationId = :medId");
     query.bindValue(":medId", dbId);
     if(!query.exec())
         throw std::runtime_error("DB-Fehler: Kann Medikament nicht löschen!");
@@ -73,7 +72,7 @@ void Medication::Delete()
 Medication Medication::CreateNew(QSqlDatabase *database, const QString& name)
 {
     QSqlQuery query(*database);
-    query.prepare("INSERT INTO Medication (name) VALUES (:name)");
+    query.prepare("INSERT INTO medication (name) VALUES (:name)");
     query.bindValue(":name", name);
     if(!query.exec())
         throw std::runtime_error("DB-Fehler: Kann Medikament nicht anlegen!");

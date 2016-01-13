@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     Model/unit.cpp \
     simulator.cpp \
     Model/medsettings.cpp \
-    Model/unitsettings.cpp
+    Model/unitsettings.cpp \
+    settingstagassign.cpp
 
 HEADERS  += homestation.h \
     datastore.h \
@@ -31,11 +32,13 @@ HEADERS  += homestation.h \
     Model/unit.h \
     simulator.h \
     Model/medsettings.h \
-    Model/unitsettings.h
+    Model/unitsettings.h \
+    settingstagassign.h
 
 FORMS    += homestation.ui \
     settings.ui \
-    simulator.ui
+    simulator.ui \
+    settingstagassign.ui
 
 RESOURCES += \
     resources.qrc

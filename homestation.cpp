@@ -103,7 +103,7 @@ void Homestation::showEvent(QShowEvent *event)
 
         if(settings == nullptr)
         {
-            settings = new Settings(dstore, this);
+            settings = new Settings(dstore);
         }
     }
     catch(std::exception& ex){

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "datastore.h"
+#include "settingstagassign.h"
 #include "Model/medsettings.h"
 #include "Model/unitsettings.h"
 
@@ -21,10 +22,14 @@ public:
 private slots:
     void AddNewMed();
     void DeleteMed();
+    void AssignUnit();
+    void DeleteUnit();
+    void UnitChanged(Unit* u);
 
 private:
     Ui::Settings *ui;
     Datastore* dstore;
+    SettingsTagAssign* tagAssign;
 
     medSettings medications;
     unitSettings units;

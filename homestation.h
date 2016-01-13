@@ -49,7 +49,7 @@ private:
     QString serialPort;
     QString dbFileName;
 
-    virtual void showEvent(QShowEvent *event);
+    virtual void showEvent(QShowEvent *event) override;
     void unknownUnit();
 };
 

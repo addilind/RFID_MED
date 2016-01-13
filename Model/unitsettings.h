@@ -20,12 +20,12 @@ public:
     void removeRow(int row);
 
     Qt::ItemFlags flags(const QModelIndex & index) const override;
-private:
-    Datastore* dstore;
-    constexpr static const char* tableHeaders[] = {"Medikament", "Erfassungen"};
-    std::vector<uint> tagIds;
 
     void UpdateBuffer();
+private:
+    Datastore* dstore;
+    constexpr static const char* tableHeaders[] = {"Medikament", "Erfassungen", "Zuletzt"};
+    std::vector<uint> tagIds;
 };
 
 #endif // UNITSETTINGS_H

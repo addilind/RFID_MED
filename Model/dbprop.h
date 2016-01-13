@@ -239,11 +239,11 @@ bool dbprop DBP_TEMPPARA::IsNull()
 {
     assert(initialized);
 
-    if(!sqlSelect.exec())
+    if(!sqlSelect.exec() || !sqlSelect.next())
         throw std::runtime_error(qPrintable(
             QApplication::tr("DB-Fehler beim Prüfen von ") + valcol::string() + "\n"
                                      + sqlSelect.lastError().text()));
-    bool isNull = sqlSelect.next();
+    bool isNull = sqlSelect.value(0).isNull();
     sqlSelect.finish();
     return isNull;
 
