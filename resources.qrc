@@ -2,5 +2,7 @@
     <qresource prefix="/icons">
         <file>pill.png</file>
         <file>drugstore.png</file>
+        <file>ok.png</file>
+        <file>missing.png</file>
     </qresource>
 </RCC>

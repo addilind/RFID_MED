@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     simulator.cpp \
     Model/medsettings.cpp \
     Model/unitsettings.cpp \
-    settingstagassign.cpp
+    settingstagassign.cpp \
+    Model/medlist.cpp
 
 HEADERS  += homestation.h \
     datastore.h \
@@ -33,7 +34,8 @@ HEADERS  += homestation.h \
     simulator.h \
     Model/medsettings.h \
     Model/unitsettings.h \
-    settingstagassign.h
+    settingstagassign.h \
+    Model/medlist.h
 
 FORMS    += homestation.ui \
     settings.ui \

@@ -19,6 +19,9 @@ public:
     explicit Settings(Datastore* dstore, QWidget *parent = 0);
     ~Settings();
 
+signals:
+    void Closing();
+
 private slots:
     void AddNewMed();
     void DeleteMed();
@@ -33,6 +36,8 @@ private:
 
     medSettings medications;
     unitSettings units;
+
+    void closeEvent(QCloseEvent * e) override;
 };
 
 #endif // SETTINGS_H

@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "datastore.h"
 #include "reader.h"
+#include "Model/medlist.h"
 
 #ifdef USESIM
 #include "simulator.h"
@@ -48,6 +49,7 @@ private:
 #endif
     QString serialPort;
     QString dbFileName;
+    medList* meds;
 
     virtual void showEvent(QShowEvent *event) override;
     void unknownUnit();

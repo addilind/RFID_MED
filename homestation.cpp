@@ -8,7 +8,8 @@ Homestation::Homestation(QWidget *parent) :
     ui(new Ui::Homestation),
     settings(nullptr),
     dstore(nullptr),
-    reader(nullptr)
+    reader(nullptr),
+    meds(nullptr)
 {
     ui->setupUi(this);
     connect(ui->settingsBtn, SIGNAL(pressed()), this, SLOT(openSettings()));
@@ -103,12 +104,20 @@ void Homestation::showEvent(QShowEvent *event)
         {
             settings = new Settings(dstore);
         }
+
+        if(meds == nullptr)
+        {
+            meds = new medList(dstore, this);
+            ui->medicationList->setModel(meds);
+            connect(settings, SIGNAL(Closing()), meds, SLOT(UpdateBuffer()));
+        }
     }
     catch(std::exception& ex){
         ui->mainPrompt->setText(tr("Fehler"));
         ui->explanation->setText(ex.what());
         ui->progressBar->setEnabled(false);
     }
+    QMainWindow::showEvent(event);
 }
 
 void Homestation::unknownUnit()
@@ -131,4 +140,6 @@ void Homestation::showUnit(Unit *u)
     ui->mainPrompt->setText(main);
     ui->explanation->setText(med.GetName());
     ui->progressBar->setEnabled(false);
+
+    meds->UpdateIcons();
 }

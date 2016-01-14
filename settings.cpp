@@ -72,3 +72,9 @@ void Settings::UnitChanged(Unit *u)
     if(u != nullptr)
         units.UpdateBuffer();
 }
+
+void Settings::closeEvent(QCloseEvent *e)
+{
+    QDialog::closeEvent(e);
+    emit Closing();
+}

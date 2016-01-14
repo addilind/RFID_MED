@@ -16,6 +16,10 @@
   <property name="windowTitle">
    <string>RFIDMed - Zuweisung</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/ok.png</normaloff>:/icons/ok.png</iconset>
+  </property>
   <property name="locale">
    <locale language="German" country="Germany"/>
   </property>
@@ -80,6 +84,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
