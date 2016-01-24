@@ -42,7 +42,7 @@ void SettingsTagAssign::Apply()
 
 void SettingsTagAssign::showEvent(QShowEvent *event)
 {
-    ui->tagIdBox->setText(""); //Zurücksetzen
+    /*ui->tagIdBox->setText(""); //Zurücksetzen
     if(currentTarget != nullptr)
     {
         delete currentTarget;
@@ -50,7 +50,7 @@ void SettingsTagAssign::showEvent(QShowEvent *event)
     }
     currentTarget = nullptr;
     ui->medicationBox->clear();
-    ui->applyBtn->setEnabled(false);
+    ui->applyBtn->setEnabled(false);*/
 
     auto meds = dstore->GetMedicationIds();
     for(auto med : meds)

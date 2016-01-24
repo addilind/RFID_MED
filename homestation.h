@@ -2,7 +2,7 @@
 #define HOMESTATION_H
 
 
-#define USESIM
+//#define USESIM
 
 #include <QMainWindow>
 #include <QString>

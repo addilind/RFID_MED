@@ -10,7 +10,7 @@ class Reader : public QObject
     Q_OBJECT
 public:
     explicit Reader(const QString& portName, QObject *parent = 0);
-    static const int POLLTIME = 2000;
+    static const int POLLTIME = 500;
     virtual ~Reader();
     void BeginConnect();
 

@@ -195,10 +195,13 @@ void Reader::doRSS()
 
 void Reader::processRSS() {
     if(readBuffer.size() < 15 || memcmp(readBuffer.constData(), "OK0057 ",7) != 0) {
-        auto msg = qPrintable(tr("Kann Tag nicht lesen, \nAntwort: ") +
-                              QString::fromLatin1(readBuffer.constData(), readBuffer.length()));
-        std::cerr << msg << std::endl;
-        throw std::runtime_error(msg);
+        //Bei lesefehler von leerem Lesefeld ausgehen
+        if(tagPresent)
+            TagChanged(false, tagId);//über Änderung benachrichtigen
+
+        tagPresent = false;
+        readerState = STATE::IDLE;
+        return;
     }
     const char* readPos = readBuffer.constData() + 7; //Überspringe OK & Länge
 
