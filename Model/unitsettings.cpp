@@ -1,6 +1,6 @@
 #include "unitsettings.h"
 
-constexpr const char* unitSettings::tableHeaders[];
+const char* unitSettings::tableHeaders[] = {"Medikament", "Erfassungen", "Zuletzt"};
 
 unitSettings::unitSettings(Datastore* dstore, QObject *parent)
     : QAbstractTableModel(parent), dstore(dstore), tagIds(dstore->GetUnitTagIds())

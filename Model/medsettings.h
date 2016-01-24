@@ -26,7 +26,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 private:
     Datastore* dstore;
-    constexpr static const char* tableHeaders[] = {"Name", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
+    static const char* tableHeaders[8];
     std::vector<uint> medIds;
 
     void UpdateBuffer();

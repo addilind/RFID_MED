@@ -1,6 +1,6 @@
 #include "medsettings.h"
 
-constexpr const char* medSettings::tableHeaders[];
+const char* medSettings::tableHeaders[8] = {"Name", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
 
 medSettings::medSettings(Datastore* dstore, QObject *parent)
     : QAbstractTableModel(parent), dstore(dstore)

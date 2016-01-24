@@ -24,7 +24,7 @@ public:
     void UpdateBuffer();
 private:
     Datastore* dstore;
-    constexpr static const char* tableHeaders[] = {"Medikament", "Erfassungen", "Zuletzt"};
+    static const char* tableHeaders[3];
     std::vector<uint> tagIds;
 };
 

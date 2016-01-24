@@ -70,7 +70,7 @@ struct constString {
     //-2, da letzter Index = - 1 & Null abschneiden
 };
 
-#define constStr(varname, content) static constexpr const char DBP_##varname [] = content; \
+#define constStr(varname, content) static constexpr const char* DBP_##varname = content; \
 typedef typename constString<sizeof(content), DBP_##varname>::templateString varname;
 
 // ================================== Ende schwarze Compilermagie ======================================
@@ -110,11 +110,11 @@ private:
     QSqlQuery sqlUpdate;
     QSqlQuery sqlSelect;
 
-    //UPDATE table SET valcol = :val WHERE idcol = :pid;
-    constStr(SQL_UPDATE1, "UPDATE ")
-    constStr(SQL_UPDATE2, " SET ")
-    constStr(SQL_UPDATE3, "= :val WHERE ")
-    constStr(SQL_UPDATE4, "= :pid;")
+    //UPDATE table SET valcol= :val WHERE idcol = :pid;
+    typedef templateString<'U','P','D','A','T','E', ' '> SQL_UPDATE1;
+    typedef templateString<' ','S','E','T',' '> SQL_UPDATE2;
+    typedef templateString<'=',' ',':','v','a','l',' ','W','H','E','R','E',' '> SQL_UPDATE3;
+    typedef templateString<'=',' ',':','p','i','d',';'> SQL_UPDATE4;
     typedef typename templateConcat< SQL_UPDATE1,
         typename templateConcat<table,
         typename templateConcat<SQL_UPDATE2,
@@ -124,10 +124,10 @@ private:
         ::Result>::Result>::Result>::Result>::Result>::Result SQL_UPDATE;
 
     //SELECT valcol FROM table WHERE idcol = :pid LIMIT 1;
-    constStr(SQL_SELECT1, "SELECT ")
-    constStr(SQL_SELECT2, " FROM ")
-    constStr(SQL_SELECT3, " WHERE ")
-    constStr(SQL_SELECT4, " = :pid LIMIT 1;")
+    typedef templateString<'S','E','L','E','C','T',' '> SQL_SELECT1;
+    typedef templateString<' ','F','R','O','M',' '> SQL_SELECT2;
+    typedef templateString<' ','W','H','E','R','E',' '> SQL_SELECT3;
+    typedef templateString<' ','=',' ',':','p','i','d',' ','L','I','M','I','T',' ','1',';'> SQL_SELECT4;
     typedef typename templateConcat< SQL_SELECT1,
         typename templateConcat<valcol,
         typename templateConcat<SQL_SELECT2,

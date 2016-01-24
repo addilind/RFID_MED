@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui sql serialport widgets
-CONFIG   += c++14
+CONFIG   += c++11 static
 
 TARGET = RFID_Med
 TEMPLATE = app

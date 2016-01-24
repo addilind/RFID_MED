@@ -29,16 +29,16 @@ private:
     QSqlDatabase* db;
 
     //Strings für compile-time dbprops anlegen
-    constStr(tableName, "medication") //SQL-Tabelle
-    constStr(idCol, "medicationId")   //Spalte, in der der Schlüssel steht
-    constStr(nameCol, "name")         //Spalte für name
-    constStr(countMoCol, "countMo")
-    constStr(countTuCol, "countTu")
-    constStr(countWeCol, "countWe")
-    constStr(countThCol, "countTh")
-    constStr(countFrCol, "countFr")
-    constStr(countSaCol, "countSa")
-    constStr(countSuCol, "countSu")
+    typedef templateString<'m','e','d','i','c','a','t','i','o','n'> tableName; //SQL-Tabelle
+    typedef templateString<'m','e','d','i','c','a','t','i','o','n','I','d'> idCol;   //Spalte, in der der Schlüssel steht
+    typedef templateString<'n','a','m','e'> nameCol;         //Spalte für name
+    typedef templateString<'c','o','u','n','t','M','o'> countMoCol;
+    typedef templateString<'c','o','u','n','t','T','u'> countTuCol;
+    typedef templateString<'c','o','u','n','t','W','e'> countWeCol;
+    typedef templateString<'c','o','u','n','t','T','h'> countThCol;
+    typedef templateString<'c','o','u','n','t','F','r'> countFrCol;
+    typedef templateString<'c','o','u','n','t','S','a'> countSaCol;
+    typedef templateString<'c','o','u','n','t','S','u'> countSuCol;
 
     dbprop<QString, tableName, nameCol, idCol> name;
     dbprop<uint8_t, tableName, countMoCol, idCol> countMo;

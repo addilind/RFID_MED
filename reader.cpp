@@ -23,10 +23,10 @@ Reader::~Reader()
 void Reader::BeginConnect()
 {
     if(!serialConn.open(QSerialPort::ReadWrite))
-        throw std::runtime_error(qPrintable(tr("Serielle Schnittstelle '") +
+        throw std::runtime_error((tr("Serielle Schnittstelle '") +
                                             serialConn.portName() +
-                                            tr("' konnte nicht geöffnet werden,\n"
-                                               "bitte per Befehlszeilenoption -p festlegen!")));
+                                            tr("' konnte nicht geoeffnet werden,\n"
+                                               "bitte per Befehlszeilenoption -p festlegen!")).toLocal8Bit());
 
     serialConn.setBaudRate(9600);
     serialConn.setDataBits(QSerialPort::DataBits::Data8);
