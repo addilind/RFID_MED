@@ -15,7 +15,7 @@ bool parseCommandline(QApplication& app, Homestation& home)
                           QStringList() << "p" << "port", //Optionsnamen
                           QApplication::tr("Serieller Port, mit dem das Lesegerät verbunden ist"), //Beschreibung
                           QApplication::tr("Port"), //Parametername
-                          "/dev/ttyUSB0" //Standardwert
+                          "COM1" //Standardwert
                       );
     parser.addOption(portOption);
 
